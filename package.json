@@ -1,26 +1,37 @@
 {
-  "name": "qrmenudeitor",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.15"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.15"
-  }
+    "name": "scrollmotion-menu-creator",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start"
+    },
+    "dependencies": {
+        "@ffmpeg/ffmpeg": "^0.12.10",
+        "@ffmpeg/util": "^0.12.1",
+        "@gsap/react": "^2.1.2",
+        "clsx": "^2.1.1",
+        "file-saver": "^2.0.5",
+        "gsap": "^3.14.2",
+        "jszip": "^3.10.1",
+        "lucide-react": "^0.469.0",
+        "next": "14.2.35",
+        "react": "^18",
+        "react-dom": "^18",
+        "react-dropzone": "^14.3.5",
+        "react-syntax-highlighter": "^16.1.1",
+        "sonner": "^1.7.4"
+    },
+    "devDependencies": {
+        "@types/file-saver": "^2.0.7",
+        "@types/node": "^20",
+        "@types/react": "^18",
+        "@types/react-dom": "^18",
+        "@types/react-syntax-highlighter": "^15.5.13",
+        "autoprefixer": "^10.0.1",
+        "postcss": "^8",
+        "tailwindcss": "^3.4.1",
+        "typescript": "^5"
+    }
 }
