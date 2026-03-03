@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, FileRejection } from 'react-dropzone';
 import { UploadCloud, FileVideo, X, AlertCircle } from 'lucide-react';
 import { MAX_FILE_SIZE } from '@/lib/ffmpeg/ffmpeg-config';
 import { clsx } from 'clsx';
@@ -21,8 +21,7 @@ function formatBytes(bytes: number) {
 
 export function DropZone({ file, onFile, onClear, disabled }: DropZoneProps) {
     const onDrop = useCallback(
-        (acceptedFiles: File[], rejections: { errors: { message: string }[] }[]) => {
-            if (rejections.length > 0) return; // errors handled via dropzone callbacks
+        (acceptedFiles: File[], rejections: FileRejection[]) => {
             if (acceptedFiles[0]) onFile(acceptedFiles[0]);
         },
         [onFile]

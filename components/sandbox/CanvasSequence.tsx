@@ -148,72 +148,88 @@ export function CanvasSequence({
     return (
         <div
             ref={containerRef}
-            className="relative w-full overflow-hidden bg-black"
+            className="relative w-full bg-black overflow-hidden flex items-center justify-center p-4 lg:p-8"
             style={{
                 // We fake the scroll height if pinning is disabled so the scrollbar still exists
                 height: isPinning ? '100vh' : `${scrollDistance}vh`
             }}
         >
-            {isPreloading ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-50 backdrop-blur-sm">
-                    <Loader2 className="w-12 h-12 text-brand-400 animate-spin mb-4" />
-                    <p className="text-xl font-bold text-white">Preloading Frames</p>
-                    <p className="text-[var(--text-muted)] mt-2">{preloadProgress}% Complete</p>
-                    <div className="w-64 h-2 bg-white/10 rounded-full mt-4 overflow-hidden">
-                        <div
-                            className="h-full bg-brand-500 transition-all duration-300"
-                            style={{ width: `${preloadProgress}%` }}
-                        />
-                    </div>
-                </div>
-            ) : (
-                <>
-                    {/* Custom Pro-UI Scroll Progress Overlay */}
-                    <div className="absolute right-6 top-1/2 -translate-y-1/2 h-[70%] max-h-[600px] w-12 flex flex-col items-center justify-between py-2 z-50 pointer-events-none">
-
-                        <div className="flex flex-col items-center gap-1 mb-3">
-                            <span className="text-[9px] font-mono text-emerald-400/90 uppercase tracking-widest font-bold">Scroller Start</span>
-                            <div className="w-4 h-px bg-emerald-400/50" />
-                            <span className="text-[9px] font-mono text-emerald-400/70 uppercase tracking-wider">Start</span>
+            {/* --- Phone Mockup Container if Mobile Mode --- */}
+            <div className={clsx(
+                "relative transition-all duration-500 overflow-hidden",
+                isMobilePreview
+                    ? "h-full max-h-[85vh] aspect-[375/812] bg-zinc-900 rounded-[3rem] shadow-[-20px_0_30px_-10px_rgba(0,0,0,0.5)] border-[12px] border-zinc-950 ring-1 ring-white/10 flex-shrink-0"
+                    : "w-full h-full"
+            )}>
+                {isMobilePreview && (
+                    <>
+                        {/* Dynamic Island / iPhone Notch */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[35%] h-6 bg-zinc-950 rounded-b-2xl z-40 flex items-center justify-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-black rounded-full" />
+                            <div className="w-1.5 h-1.5 bg-zinc-800 rounded-full" />
                         </div>
+                    </>
+                )}
 
-                        <div className="relative w-1.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                {isPreloading ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-50 backdrop-blur-sm">
+                        <Loader2 className="w-12 h-12 text-brand-400 animate-spin mb-4" />
+                        <p className="text-xl font-bold text-white">Preloading Frames</p>
+                        <p className="text-[var(--text-muted)] mt-2">{preloadProgress}% Complete</p>
+                        <div className="w-64 h-2 bg-white/10 rounded-full mt-4 overflow-hidden">
                             <div
-                                ref={progressBarRef}
-                                className="absolute top-0 left-0 w-full bg-brand-500 rounded-full shadow-[0_0_12px_rgba(91,108,248,1)]"
-                                style={{ height: '0%' }}
+                                className="h-full bg-brand-500 transition-all duration-300"
+                                style={{ width: `${preloadProgress}%` }}
                             />
                         </div>
+                    </div>
+                ) : (
+                    <>
+                        {/* Custom Pro-UI Scroll Progress Overlay */}
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 h-[70%] max-h-[600px] w-12 flex flex-col items-center justify-between py-2 z-50 pointer-events-none">
 
-                        {/* Moving Percentage Tag */}
-                        <div className="absolute inset-y-12 right-0 w-full h-[calc(100%-6rem)]">
-                            <div
-                                ref={progressTextRef}
-                                className="absolute right-6 flex items-center justify-center min-w-[36px] bg-black/80 backdrop-blur-md px-1.5 py-1 rounded-md text-[10px] font-mono font-bold text-white border border-white/10 shadow-lg"
-                                style={{ top: '0%', transform: 'translateY(-50%)' }}
-                            >
-                                0%
+                            <div className="flex flex-col items-center gap-1 mb-3">
+                                <span className="text-[9px] font-mono text-emerald-400/90 uppercase tracking-widest font-bold">Scroller Start</span>
+                                <div className="w-4 h-px bg-emerald-400/50" />
+                                <span className="text-[9px] font-mono text-emerald-400/70 uppercase tracking-wider">Start</span>
+                            </div>
+
+                            <div className="relative w-1.5 flex-1 bg-white/10 rounded-full overflow-hidden shadow-inner">
+                                <div
+                                    ref={progressBarRef}
+                                    className="absolute top-0 left-0 w-full bg-brand-500 rounded-full shadow-[0_0_12px_rgba(91,108,248,1)]"
+                                    style={{ height: '0%' }}
+                                />
+                            </div>
+
+                            {/* Moving Percentage Tag */}
+                            <div className="absolute inset-y-12 right-0 w-full h-[calc(100%-6rem)]">
+                                <div
+                                    ref={progressTextRef}
+                                    className="absolute right-6 flex items-center justify-center min-w-[36px] bg-black/80 backdrop-blur-md px-1.5 py-1 rounded-md text-[10px] font-mono font-bold text-white border border-white/10 shadow-lg"
+                                    style={{ top: '0%', transform: 'translateY(-50%)' }}
+                                >
+                                    0%
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-1 mt-3">
+                                <span className="text-[9px] font-mono text-red-400/70 uppercase tracking-wider">End</span>
+                                <div className="w-4 h-px bg-red-400/50" />
+                                <span className="text-[9px] font-mono text-red-400/90 font-bold uppercase tracking-widest">Scroller End</span>
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-center gap-1 mt-3">
-                            <span className="text-[9px] font-mono text-red-400/70 uppercase tracking-wider">End</span>
-                            <div className="w-4 h-px bg-red-400/50" />
-                            <span className="text-[9px] font-mono text-red-400/90 font-bold uppercase tracking-widest">Scroller End</span>
+                        <div className="absolute inset-0 flex items-center justify-center w-full h-full pointer-events-none">
+                            <canvas
+                                ref={canvasRef}
+                                className="w-full h-full object-cover shadow-2xl transition-all duration-500"
+                            />
                         </div>
-                    </div>
-
-                    <div className="absolute inset-0 flex items-center justify-center w-full h-full pointer-events-none">
-                        <canvas
-                            ref={canvasRef}
-                            className={clsx(
-                                "max-h-full object-cover shadow-2xl transition-all duration-500",
-                                isMobilePreview ? "w-full max-w-[375px]" : "w-full"
-                            )}
-                        />
-                    </div>
-                </>
-            )}
+                    </>
+                )}
+            </div>
+            {/* --- End Phone Mockup --- */}
         </div>
     );
 }
