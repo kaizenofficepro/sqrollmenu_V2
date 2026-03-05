@@ -22,27 +22,30 @@ export function SandboxLoader({ onLoad }: SandboxLoaderProps) {
             const zip = new JSZip();
             const contents = await zip.loadAsync(file);
 
-            // Filter only webp files
-            const webpFiles = Object.keys(contents.files).filter(
-                (name) => name.endsWith('.webp') && !contents.files[name].dir
-            );
+            // Filter for supported image types and ignore macOS __MACOSX system folders
+            const imageFiles = Object.keys(contents.files).filter((name) => {
+                if (contents.files[name].dir) return false;
+                if (name.includes('__MACOSX')) return false;
+                const lowerName = name.toLowerCase();
+                return lowerName.endsWith('.webp') || lowerName.endsWith('.png') || lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg');
+            });
 
-            if (webpFiles.length === 0) {
-                throw new Error("No WebP files found in the ZIP.");
+            if (imageFiles.length === 0) {
+                throw new Error("No supported image files (.webp, .png, .jpg) found in the ZIP.");
             }
 
             // Ensure natural sorting (frame_001, frame_002, etc.)
-            webpFiles.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+            imageFiles.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
             const urls: string[] = [];
             let processed = 0;
 
-            for (const filename of webpFiles) {
+            for (const filename of imageFiles) {
                 const fileData = await contents.file(filename)!.async('blob');
                 const url = URL.createObjectURL(fileData);
                 urls.push(url);
                 processed++;
-                setProgress(Math.round((processed / webpFiles.length) * 100));
+                setProgress(Math.round((processed / imageFiles.length) * 100));
             }
 
             toast.success(`Loaded ${urls.length} frames successfully!`);
