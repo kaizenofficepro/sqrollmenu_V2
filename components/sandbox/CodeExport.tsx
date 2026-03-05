@@ -19,14 +19,39 @@ import { useEffect, useRef, useState } from 'react';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// ─────────────────────────────────────────────────
+// Tuned Parameters (from ScrollyTelling Sandbox)
+// ─────────────────────────────────────────────────
+const CONFIG = {
+    frameCount: ${frameCount},
+    scrubInertia: ${settings.scrubSmoothness},     // GSAP scrub delay in seconds
+    scrollDistance: '${settings.scrollDistance}vh', // scrollable pin height
+    pin: ${settings.isPinning},
+    lenisLerp: ${settings.lenisLerp},              // Lenis smoothing (0.01–1)
+    lenisWheelMultiplier: ${settings.lenisWheelMultiplier}, // wheel sensitivity
+};
+
 // 1. Array of your generated WEBP frame URLs
 const FRAME_URLS = Array.from(
-    { length: ${frameCount} }, 
+    { length: CONFIG.frameCount },
     (_, i) => \`/frames/frame_\${String(i + 1).padStart(3, '0')}.webp\`
 );
+
+// 2. Init Lenis (smooth scroll engine) once at app level
+const lenis = new Lenis({
+    lerp: CONFIG.lenisLerp,
+    wheelMultiplier: CONFIG.lenisWheelMultiplier,
+    smoothWheel: true,
+});
+
+// Connect Lenis RAF loop to GSAP ScrollTrigger
+gsap.ticker.add((time) => lenis.raf(time * 1000));
+gsap.ticker.lagSmoothing(0);
+lenis.on('scroll', ScrollTrigger.update);
 
 export function MyScrollAnimation() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +62,7 @@ export function MyScrollAnimation() {
         // Preload all ${frameCount} images to memory to prevent flickering
         const imgArray: HTMLImageElement[] = [];
         let loadedCount = 0;
-        
+
         FRAME_URLS.forEach((url, i) => {
             const img = new Image();
             img.src = url;
@@ -46,7 +71,6 @@ export function MyScrollAnimation() {
                 loadedCount++;
                 if (loadedCount === FRAME_URLS.length) {
                     setImages(imgArray);
-                     // Draw first frame instantly
                     const ctx = canvasRef.current?.getContext('2d');
                     if (ctx && imgArray[0]) {
                         canvasRef.current!.width = imgArray[0].width;
@@ -56,6 +80,8 @@ export function MyScrollAnimation() {
                 }
             };
         });
+
+        return () => { lenis.destroy(); };
     }, []);
 
     useGSAP(() => {
@@ -68,9 +94,9 @@ export function MyScrollAnimation() {
         const trigger = ScrollTrigger.create({
             trigger: containerRef.current,
             start: 'top top',
-            end: '+=${settings.scrollDistance}vh',
-            pin: ${settings.isPinning},
-            scrub: ${settings.scrubSmoothness},
+            end: \`+=\${CONFIG.scrollDistance}\`,
+            pin: CONFIG.pin,
+            scrub: CONFIG.scrubInertia,
             animation: gsap.to(sequence, {
                 frame: ${frameCount - 1},
                 snap: 'frame',
